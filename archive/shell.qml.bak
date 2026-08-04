@@ -1,0 +1,120 @@
+import Quickshell
+import Quickshell.Wayland
+import Quickshell.Hyprland
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Effects
+import "."
+
+Variants {
+
+   model: Quickshell.screens
+
+   // Actual Panel itself
+   PanelWindow {
+      id: panel
+      required property var modelData
+      screen: modelData
+      anchors.top: true
+      anchors.left: true
+      anchors.right: true
+      implicitHeight: 50
+      color: "transparent"
+      property var hyprMonitor: Hyprland.monitorFor(screen)
+
+      // divisions of the panel
+      RowLayout {
+         anchors.fill: parent
+         anchors.margins: 10
+
+         // Workspace Switcher
+         Rectangle {
+            id: workspaceBox
+            Layout.preferredWidth: workspaceRow.implicitWidth + 16
+            Layout.preferredHeight: workspaceRow.implicitHeight + 10
+            color: Colors.md3.surface
+            radius: 12
+            property bool parentHovered: hoverOverSwitcher.hovered
+            clip: true
+
+            Behavior on Layout.preferredWidth {
+               NumberAnimation {
+                  duration: 150
+                  easing.type: Easing.OutQuad
+
+               }
+            }
+            HoverHandler{
+               id: hoverOverSwitcher
+
+            }
+
+            RowLayout {
+               id: workspaceRow
+               anchors.centerIn: parent
+               // anchors.fill: parent
+               anchors.margins: 8
+
+               Repeater {
+                  id: workspaceRepeater
+                  model: Hyprland.workspaces.values
+                  Rectangle{
+                     id: littleContainers
+                     width: workspaceNums.implicitWidth + 5 + ((workspaceNums.implicitWidth + 5) % 2)
+                     height: workspaceNums.implicitHeight + 3
+                     radius: 12
+                     visible: workspaceBox.parentHovered ? true : workspaceNums.thisMonitor
+                     HoverHandler {
+                        id: hoverLittleCont
+                     }
+                     // color: hoverLittleCont.hovered ? Colors.md3.primary_container : Colors.md3.background
+                     color: Colors.md3.background
+                     Behavior on color {
+                        ColorAnimation{
+                           duration: 100
+                           // easing.type: Easing.OutQuad
+                        }
+                     }
+
+                     required property var modelData
+                     MouseArea {
+                        anchors.fill: parent
+                        onClicked: Hyprland.dispatch("hl.dsp.focus({workspace = " + modelData.id + "})")
+                     }
+
+                     Text {
+                        id: workspaceNums
+                        // property var ws: Hyprland.workspaces.values.find(w => w.id === index + 1)
+                        // required property var workspaceRepeater.modelData
+                        property var ws: littleContainers.modelData
+                        property bool thisMonitor: ws.monitor == panel.hyprMonitor
+                        property bool inFocus: ws.focused
+                        // property bool isActive: Hyprland.focusedWorkspace?.id === (index + 1)
+                        //
+                        visible: workspaceBox.parentHovered ? true : thisMonitor
+                        // visible: thisMonitor
+                        anchors.centerIn: parent
+                        text: ws.id
+
+                        font { pixelSize: 16; bold: true }
+                        // property  color computedColor: {
+                        //
+                        //    if(inFocus) return Colors.md3.primary
+                        //       if(thisMonitor){ return Colors.md3.secondary }
+
+                        color: inFocus ? Colors.md3.primary : thisMonitor ? Colors.md3.on_background: Colors.md3.tertiary_container
+
+                     }
+                  }
+               }
+
+               // Item {
+               // 	Layout.fillWidth: true
+               // }
+            }
+
+         }
+
+      }
+   }
+}

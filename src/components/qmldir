@@ -2,3 +2,4 @@ module components
 Bar 1.0 Bar.qml
 WorkspaceSwitch 1.0 WorkspaceSwitch.qml
 AboutArch 1.0 AboutArch.qml
+

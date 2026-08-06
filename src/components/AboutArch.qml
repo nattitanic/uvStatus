@@ -6,6 +6,7 @@ import QtQuick.Layouts
 import QtQuick.Effects
 import Quickshell.Widgets
 import "../themes"
+import "./popups"
 
 Rectangle {
    id: iconRoot
@@ -16,7 +17,6 @@ Rectangle {
    radius: 12
    color: Colors.md3.surface
    clip: true
-   property bool expanded: false
 
    Behavior on implicitWidth {
       NumberAnimation {
@@ -40,7 +40,7 @@ Rectangle {
       id: hoverDelay
       interval: 500
       repeat: false
-      onTriggered: iconRoot.expanded = true
+      onTriggered: if(hoverOverIcon.hovered) iconRoot.expanded = true
    }
 
    RowLayout {
@@ -75,11 +75,11 @@ Rectangle {
       Item {
          height: 35
          width: joke.implicitWidth
-         visible: iconRoot.expanded ? true : false
+         visible: iconRoot.expanded ? true : popupOpen
          Text {
             id: joke
             anchors.centerIn: parent
-            text: "uwu please activate arch 🥺"
+            text: "uwu please activate linux 🥺"
             font { pixelSize: 16; bold: true }
             color: Colors.md3.primary
          }
